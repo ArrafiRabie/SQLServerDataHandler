@@ -32,6 +32,7 @@ namespace ConnectionTest
                         Console.WriteLine($" Newly Inserted ID: {InsertedID}");
                     else
                         Console.WriteLine(" Failed to Retrieve the Inserted ID.");
+                    Connection.Close();
                 }
                 catch (Exception ex)
                 {
