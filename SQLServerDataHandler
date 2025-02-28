@@ -1,0 +1,69 @@
+using System;
+using System.Data;
+using System.Data.SqlClient;
+
+namespace ConnectionTest
+{
+    internal class Program
+    {
+        static string ConnectionInSqlServer = "Server=.;Database=ContactsDB;User Id=sa;Password=123456;";
+
+        static void InsertAndReturnAutoNumber(DataForCode DFC)
+        {
+            string Query = @"INSERT INTO Contacts (FirstName, LastName, Email, Phone, Address, CountryID)
+                             VALUES (@FirstName, @LastName, @Email, @Phone, @Address, @CountryID);
+                             SELECT SCOPE_IDENTITY();";
+
+            using (SqlConnection Connection = new SqlConnection(ConnectionInSqlServer))
+            using (SqlCommand Command = new SqlCommand(Query, Connection))
+            {
+                Command.Parameters.AddWithValue("@FirstName", DFC.FirstName);
+                Command.Parameters.AddWithValue("@LastName", DFC.LastName);
+                Command.Parameters.AddWithValue("@Email", DFC.Email);
+                Command.Parameters.AddWithValue("@Phone", DFC.Phone);
+                Command.Parameters.AddWithValue("@Address", DFC.Address);
+                Command.Parameters.AddWithValue("@CountryID", DFC.CountryID);
+
+                try
+                {
+                    Connection.Open();
+                    object Result = Command.ExecuteScalar();
+                    if (Result != null && int.TryParse(Result.ToString(), out int InsertedID))
+                        Console.WriteLine($" Newly Inserted ID: {InsertedID}");
+                    else
+                        Console.WriteLine(" Failed to Retrieve the Inserted ID.");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($" Error: {ex.Message}");
+                }
+            }
+        }
+
+        public struct DataForCode
+        {
+            public int ID { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public string Address { get; set; }
+            public int CountryID { get; set; }
+        }
+
+        static void Main(string[] args)
+        {
+            DataForCode dataForCode = new DataForCode
+            {
+                FirstName = "Yaasine",
+                LastName = "Arrafi",
+                Email = "YassineArrafi@gmail.com",
+                Phone = "0777858454",
+                Address = "Khouribga hay riad 457",
+                CountryID = 1
+            };
+
+            InsertAndReturnAutoNumber(dataForCode);
+        }
+    }
+}
